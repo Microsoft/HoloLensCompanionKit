@@ -3,7 +3,7 @@
 
 using System;
 using UnityEngine;
-using UnityEngine.VR.WSA;
+using UnityEngine.XR.WSA;
 
 namespace MixedRemoteViewCompositor
 {
