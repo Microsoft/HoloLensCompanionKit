@@ -458,7 +458,7 @@ HRESULT CaptureEngineImpl::StartAsync(
                 ComPtr<MixedRemoteViewCompositor::Media::MrcAudioEffectDefinitionImpl> mrcAudioEffectDefinition;
                 MakeAndInitialize<MrcAudioEffectDefinitionImpl>(&mrcAudioEffectDefinition);
 
-                IFR(mrcAudioEffectDefinition->put_MixerMode(AudioMixerMode_Mic));
+                IFR(mrcAudioEffectDefinition->put_MixerMode(AudioMixerMode_MicAndLoopback));
 
                 ComPtr<ABI::Windows::Media::Effects::IAudioEffectDefinition> audioEffectDefinition;
                 IFR(mrcAudioEffectDefinition.As(&audioEffectDefinition));

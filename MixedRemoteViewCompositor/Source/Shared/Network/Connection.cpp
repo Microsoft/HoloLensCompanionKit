@@ -327,111 +327,117 @@ HRESULT ConnectionImpl::SendBundle(
 
 _Use_decl_annotations_
 HRESULT ConnectionImpl::SendBundleAsync(
-    IDataBundle *dataBundle,
-    IAsyncAction **sendAction)
+	IDataBundle *dataBundle,
+	IAsyncAction **sendAction)
 {
-    Log(Log_Level_Info, L"ConnectionImpl::SendBundleAsync\n");
+	Log(Log_Level_Info, L"ConnectionImpl::SendBundleAsyncSequenced\n");
 
-    NULL_CHK(dataBundle);
-    NULL_CHK(sendAction);
+	NULL_CHK(dataBundle);
+	NULL_CHK(sendAction);
 
-    {
-        auto lock = _lock.Lock();
+	{
+		auto lock = _lock.Lock();
 
-        IFR(CheckClosed());
-    }
+		IFR(CheckClosed());
+	}
 
-    UINT32 bufferCount = 0;
-    IFR(dataBundle->get_BufferCount(&bufferCount));
+	ComPtr<WriteCompleteImpl> spWriteAction;
+	IFR(MakeAndInitialize<WriteCompleteImpl>(&spWriteAction, 1));
 
-    ComPtr<WriteCompleteImpl> spWriteAction;
-    IFR(MakeAndInitialize<WriteCompleteImpl>(&spWriteAction, bufferCount));
+	// define workitem
+	ComPtr<IDataBundle> spDataBundle(dataBundle);
+	ComPtr<ConnectionImpl> spThis(this);
+	auto workItem =
+		Microsoft::WRL::Callback<ABI::Windows::System::Threading::IWorkItemHandler>(
+			[this, spThis, spDataBundle, spWriteAction](IAsyncAction* asyncAction) -> HRESULT
+	{
+		ComPtr<IOutputStream> spOutputStream;
+		DataBundleImpl::Container buffers;
+		DataBundleImpl::Iterator iter;
 
-    // define workitem
-    ComPtr<IDataBundle> spDataBundle(dataBundle);
-    ComPtr<ConnectionImpl> spThis(this);
-    auto workItem =
-        Microsoft::WRL::Callback<ABI::Windows::System::Threading::IWorkItemHandler>(
-            [this, spThis, spDataBundle, spWriteAction](IAsyncAction* asyncAction) -> HRESULT
-    {
-        ComPtr<IOutputStream> spOutputStream;
-        DataBundleImpl::Container buffers;
-        DataBundleImpl::Iterator iter;
+		ComPtr<IStreamWriteOperation> writeOperation;
+		ComPtr<IBuffer> rawBuffer;
+		ComPtr<IDataBuffer> singleBuffer;
 
-        HRESULT hr = S_OK;
+		HRESULT hr = S_OK;
 
-        {
-            auto lock = _lock.Lock();
+		{
+			auto lock = _lock.Lock();
 
-            IFC(CheckClosed());
+			IFC(CheckClosed());
 
-            // get the output stream for socket
-            if (nullptr != _streamSocket)
-            {
-                IFC(_streamSocket->get_OutputStream(&spOutputStream));
-            }
-            else
-            {
-                IFC(E_UNEXPECTED);
-            }
-        }
+			// get the output stream for socket
+			if (nullptr != _streamSocket)
+			{
+				IFC(_streamSocket->get_OutputStream(&spOutputStream));
+			}
+			else
+			{
+				IFC(E_UNEXPECTED);
+			}
+		}
 
-        DataBundleImpl* bundleImpl = static_cast<DataBundleImpl*>(spDataBundle.Get());
-        if (nullptr == bundleImpl)
-        {
-            IFC(E_INVALIDARG);
-        }
+		DataBundleImpl* bundleImpl = static_cast<DataBundleImpl*>(spDataBundle.Get());
+		if (nullptr == bundleImpl)
+		{
+			IFC(E_INVALIDARG);
+		}
 
-        // send one buffer at a time syncronously
-        IFC(bundleImpl->get_Buffers(&buffers));
-        iter = buffers.begin();
-        for (; iter != buffers.end(); ++iter)
-        {
-            ComPtr<IStreamWriteOperation> spWriteOperation;
-            ComPtr<IBuffer> rawBuffer;
-            IFC((*iter).As(&rawBuffer));
+		//make a single big buffer
+		ULONG totalSize;
+		IFC(bundleImpl->get_TotalSize(&totalSize));
 
-            IFC(spOutputStream->WriteAsync(rawBuffer.Get(), &spWriteOperation));
+		IFC(MakeAndInitialize<DataBufferImpl>(&singleBuffer, totalSize));
 
-            // start async write operation
-            IFC(StartAsyncThen(
-                spWriteOperation.Get(),
-                [this, spThis, spWriteAction](_In_ HRESULT hr, _In_ IStreamWriteOperation *asyncResult, _In_ AsyncStatus asyncStatus) -> HRESULT
-            {
-                LOG_RESULT(hr);
+		DataBufferImpl * bufferImpl = static_cast<DataBufferImpl*>(singleBuffer.Get());
 
-                spWriteAction->SignalCompleted(hr);
+		if (nullptr == bufferImpl) 
+		{
+			IFC(E_INVALIDARG);
+		}
 
-                return S_OK;
-            }));
-        }
+		BYTE* rawSingleBuffer;
+		IFC(bufferImpl->get_Buffer(&rawSingleBuffer));
 
-    done:
-        if (FAILED(hr))
-        {
-            spWriteAction->SignalCompleted(hr);
-        }
+		DWORD copied;
+		IFC(bundleImpl->CopyTo(0, totalSize, &rawSingleBuffer[0], &copied));
 
-        return S_OK;
-    });
+		IFC(bufferImpl->put_CurrentLength(copied));
 
-    ComPtr<IAsyncAction> workerAsync;
-    IFR(_threadPoolStatics->RunAsync(workItem.Get(), &workerAsync));
+		IFC(singleBuffer.As(&rawBuffer));
 
-    IFR(StartAsyncThen(
-        workerAsync.Get(),
-        [this, spThis, spWriteAction](_In_ HRESULT hr, _In_ IAsyncAction *asyncResult, _In_ AsyncStatus asyncStatus) -> HRESULT
-    {
-        if (FAILED(hr))
-        {
-            spWriteAction->SignalCompleted(hr);
-        }
+		IFC(spOutputStream->WriteAsync(rawBuffer.Get(), &writeOperation));
 
-        return S_OK;
-    }));
+		hr = SyncWait<UINT32, UINT32>(writeOperation.Get(), 1);
 
-    // hand off async op
-    return spWriteAction.CopyTo(sendAction);
+		spWriteAction->SignalCompleted(hr);
+
+	done:
+		if (FAILED(hr))
+		{
+			spWriteAction->SignalCompleted(hr);
+		}
+
+		return S_OK;
+	});
+
+	ComPtr<IAsyncAction> workerAsync;
+	IFR(_threadPoolStatics->RunAsync(workItem.Get(), &workerAsync));
+
+	IFR(StartAsyncThen(
+		workerAsync.Get(),
+		[this, spThis, spWriteAction](_In_ HRESULT hr, _In_ IAsyncAction *asyncResult, _In_ AsyncStatus asyncStatus) -> HRESULT
+	{
+		if (FAILED(hr))
+		{
+			spWriteAction->SignalCompleted(hr);
+		}
+
+		return S_OK;
+	}));
+
+	// hand off async op
+	return spWriteAction.CopyTo(sendAction);
 }
 
 // IConnectionInternal

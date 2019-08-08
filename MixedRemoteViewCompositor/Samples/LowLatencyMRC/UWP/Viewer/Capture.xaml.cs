@@ -41,14 +41,14 @@ namespace Viewer
                     this.connection.Disconnected += Connection_Disconnected;
                     this.connection.Received += Connection_Received;
 
-                    StartCapture();
+                    StartCapture(cbEnableAudio.IsChecked.GetValueOrDefault(false));
                 }
             }
         }
 
-        private async void StartCapture()
+        private async void StartCapture(bool enableAudio)
         {
-            captureEngine = await CaptureEngine.CreateAsync(false);
+            captureEngine = await CaptureEngine.CreateAsync(enableAudio);
             if (this.captureEngine != null)
             {
                 await this.captureEngine.StartAsync(false, this.connection);

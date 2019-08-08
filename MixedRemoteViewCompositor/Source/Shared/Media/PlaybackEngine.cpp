@@ -411,7 +411,8 @@ HRESULT PlaybackEngineImpl::StartPlayback()
 
     NULL_CHK_HR(_sourceReader, E_NOT_SET);
 
-    IFR(RequestNextSampleAsync(MF_SOURCE_READER_FIRST_VIDEO_STREAM));
+	IFR(RequestNextSampleAsync(MF_SOURCE_READER_ANY_STREAM));
+    //IFR(RequestNextSampleAsync(MF_SOURCE_READER_FIRST_VIDEO_STREAM));
 
     //IFR(RequestNextSampleAsync(MF_SOURCE_READER_FIRST_AUDIO_STREAM));
 
