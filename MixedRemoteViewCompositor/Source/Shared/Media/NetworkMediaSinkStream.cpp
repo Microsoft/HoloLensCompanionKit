@@ -1057,7 +1057,7 @@ HRESULT NetworkMediaSinkStreamImpl::ProcessCameraData(
     UINT32 blobSize = 0;
 
     using float4x4 = ABI::Windows::Foundation::Numerics::Matrix4x4;
-    MFPinholeCameraIntrinsics cameraIntrinsics;
+    ABI::MixedRemoteViewCompositor::MFPinholeCameraIntrinsics cameraIntrinsics;
     float4x4 worldToCameraMatrix;
     float4x4 cameraProjectionTransform;
     float4x4 cameraViewTransform;

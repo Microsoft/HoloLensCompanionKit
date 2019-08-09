@@ -15,16 +15,16 @@ import "Windows.Storage.idl";
 import "Windows.Storage.Streams.idl";
 
 // Additional imports to ensure that all required headers are included
-cpp_quote("#if defined(__cplusplus)")
-cpp_quote("}")
-cpp_quote("#endif // defined(__cplusplus)")
+//cpp_quote("#if defined(__cplusplus)")
+//cpp_quote("}")
+//cpp_quote("#endif // defined(__cplusplus)")
 cpp_quote("#include <Windows.Foundation.h>")
 cpp_quote("#if !defined(__windows2Enetworking2Esockets_h__)")
 cpp_quote("#include <Windows.Networking.Sockets.h>")
 cpp_quote("#endif // !defined(__windows2Enetworking2Esockets_h__)")
-cpp_quote("#if defined(__cplusplus)")
-cpp_quote("extern \"C\" {")
-cpp_quote("#endif // defined(__cplusplus)")
+//cpp_quote("#if defined(__cplusplus)")
+//cpp_quote("extern \"C\" {")
+//cpp_quote("#endif // defined(__cplusplus)")
 
 namespace MixedRemoteViewCompositor
 {
@@ -293,7 +293,7 @@ namespace MixedRemoteViewCompositor {
         Windows.Foundation.Numerics.Matrix4x4 worldToCameraMatrix;
         Windows.Foundation.Numerics.Matrix4x4 cameraProjectionTransform;
         Windows.Foundation.Numerics.Matrix4x4 cameraViewTransform;
-        MFPinholeCameraIntrinsics cameraIntrinsics;
+		MFPinholeCameraIntrinsics cameraIntrinsics;
     };
 
     [version(1.0)]
