@@ -19,8 +19,8 @@
     <PackageCertificateKeyFile>HoloLensCommander_TemporaryKey.pfx</PackageCertificateKeyFile>
     <AppxAutoIncrementPackageRevision>True</AppxAutoIncrementPackageRevision>
     <AppxBundle>Always</AppxBundle>
-    <AppxBundlePlatforms>x86|x64</AppxBundlePlatforms>
-    <PackageCertificateThumbprint>45A74AE0CFE4E2E056BE059B6F77620B0309D3E2</PackageCertificateThumbprint>
+    <AppxBundlePlatforms>x86</AppxBundlePlatforms>
+    <PackageCertificateThumbprint>A4B49ABD7F86BC59443864123563E3BB0CCBC3A9</PackageCertificateThumbprint>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Debug|x86'">
     <DebugSymbols>true</DebugSymbols>
@@ -131,6 +131,17 @@
     <Compile Include="Dialogs\ManageAppsDialogViewModelProperties.cs" />
     <Compile Include="Dialogs\MixedRealityViewDialogViewModel.cs" />
     <Compile Include="Dialogs\MixedRealityViewDialogViewModelProperties.cs" />
+    <Compile Include="Dialogs\MobileCenterAppsDialog.xaml.cs">
+      <DependentUpon>MobileCenterAppsDialog.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Dialogs\MobileCenterAppsDialogViewModel.cs" />
+    <Compile Include="Dialogs\MobileCenterAppsDialogViewModelCommands.cs" />
+    <Compile Include="Dialogs\MobileCenterAppsDialogViewModelProperties.cs" />
+    <Compile Include="Dialogs\SetAPItokenDialog.xaml.cs">
+      <DependentUpon>SetAPItokenDialog.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Dialogs\SetAPItokenDialogViewModel.cs" />
+    <Compile Include="Dialogs\SetAPItokenDialogViewModelProperties.cs" />
     <Compile Include="Dialogs\SetCredentialsDialogViewModel.cs" />
     <Compile Include="Dialogs\SetCredentialsDialogViewModelProperties.cs" />
     <Compile Include="Dialogs\SetIpdDialog.xaml.cs">
@@ -165,6 +176,7 @@
       <DependentUpon>SettingsDialog.xaml</DependentUpon>
     </Compile>
     <Compile Include="Utilities\AppInstallFiles.cs" />
+    <Compile Include="Utilities\AppResponse.cs" />
     <Compile Include="Utilities\ConnectionInformation.cs" />
     <Compile Include="Utilities\ConnectOptions.cs" />
     <Compile Include="Utilities\DeviceMonitorControlComparer.cs" />
@@ -174,7 +186,9 @@
     <Compile Include="Utilities\Settings.cs" />
     <Compile Include="Utilities\TagInformation.cs" />
     <Compile Include="Utilities\UserInformation.cs" />
+    <Compile Include="Utilities\UserToken.cs" />
     <Compile Include="Utilities\Utilities.cs" />
+    <Compile Include="Utilities\WebRequest.cs" />
   </ItemGroup>
   <ItemGroup>
     <AppxManifest Include="Package.appxmanifest">
@@ -209,6 +223,14 @@
       <SubType>Designer</SubType>
     </Page>
     <Page Include="Dialogs\GetAppInstallFilesDialog.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Dialogs\MobileCenterAppsDialog.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Dialogs\SetAPItokenDialog.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>

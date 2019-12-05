@@ -1,6 +1,7 @@
 ﻿// Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT License. See LICENSE in the project root for license information.
 
+using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -586,6 +587,38 @@ namespace HoloLensCommander
             }
         }
 
+        public ICommand ShowMobileCenterAppsCommand
+        { get; private set; }
+
+        private async Task ShowMobileCenterApps()
+        {
+            AppCenterWebRequest appCenterWebRequest = new AppCenterWebRequest();
+            string requestResponseJson = await appCenterWebRequest.HttpWebRequest();
+
+            AppResponse[] appResponse;
+            appResponse = JsonConvert.DeserializeObject<AppResponse[]>(requestResponseJson);
+
+            ContentDialog mobileCenterAppsDialog = new MobileCenterAppsDialog(appResponse);
+            await mobileCenterAppsDialog.ShowAsync();
+        }
+
+        public ICommand ShowSetAPItokenCommand
+        { get; private set; }
+
+        private async Task ShowSetAPItoken()
+        {
+            UserToken apiToken = new UserToken(this.ApiToken);
+
+            SetAPItokenDialog apiTokenDialogs = new SetAPItokenDialog(apiToken);
+            ContentDialogResult dialogResult = await apiTokenDialogs.ShowAsync();
+
+            if (dialogResult==ContentDialogResult.Primary)
+            {
+                this.ApiToken = apiToken.ApiToken;
+                this.SaveApplicationSettings();
+            }
+        }
+
         /// <summary>
         /// Command used to display the settings dialog.
         /// </summary>
@@ -860,6 +893,10 @@ namespace HoloLensCommander
             this.UserName = this.appSettings.Values[DefaultUserNameKey] as string;
             this.Password = this.appSettings.Values[DefaultPasswordKey] as string;
 
+            this.ApiToken = this.appSettings.Values[DefaultAPItokenKey] as string;
+            this.AppCenterUserName = this.appSettings.Values[DefaultAppCenterUserNameKey] as string;
+            this.AppCenterPassword = this.appSettings.Values[DefaultAppCenterPasswordKey] as string;
+
             this.defaultSsid = this.appSettings.Values[DefaultSsidKey] as string;
             this.defaultNetworkKey = this.appSettings.Values[DefaultNetworkKeyKey] as string;
 
@@ -982,6 +1019,10 @@ namespace HoloLensCommander
         {
             this.appSettings.Values[DefaultUserNameKey] = this.UserName;
             this.appSettings.Values[DefaultPasswordKey] = this.Password;
+
+            this.appSettings.Values[DefaultAPItokenKey] = this.ApiToken;
+            this.appSettings.Values[DefaultAppCenterUserNameKey] = this.AppCenterUserName;
+            this.appSettings.Values[DefaultAppCenterPasswordKey] = this.AppCenterPassword;
 
             this.appSettings.Values[DefaultSsidKey] = this.defaultSsid;
             this.appSettings.Values[DefaultNetworkKeyKey] = this.defaultNetworkKey;

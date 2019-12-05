@@ -315,6 +315,21 @@
                     Command="{Binding Path=UseDesktopFilterCommand}"
                     HorizontalAlignment="Left" Width="130" 
                     Canvas.Left="545" Canvas.Top="8"/>
+            <Button 
+                Content="&#xEE57;" 
+                ToolTipService.ToolTip="Enter API token"
+                Command="{Binding Path=ShowSetAPItokenCommand}"
+                FontFamily="Segoe MDL2 Assets"
+                Width="50" Height="40"
+                Canvas.Top="5" Canvas.Left="675"/>
+            <Button 
+                Content="&#xE71D;" 
+                ToolTipService.ToolTip="Display Mobile Center app list"
+                Command="{Binding Path=ShowMobileCenterAppsCommand}"
+                IsEnabled="{Binding Path=ApiTokenSet}"
+                FontFamily="Segoe MDL2 Assets"
+                Width="50" Height="40"
+                Canvas.Top="5" Canvas.Left="730"/>
         </Canvas>
         <ScrollViewer Grid.Column="1" Grid.Row="1"
             VerticalScrollBarVisibility="Auto" VerticalScrollMode="Auto">

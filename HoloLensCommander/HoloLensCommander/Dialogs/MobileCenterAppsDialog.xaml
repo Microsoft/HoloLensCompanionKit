@@ -1,0 +1,56 @@
+﻿<ContentDialog
+    x:Class="HoloLensCommander.MobileCenterAppsDialog"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:local="using:HoloLensCommander"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    mc:Ignorable="d"
+    Title="Mobile Center Apps"
+    PrimaryButtonText="Close"
+    PrimaryButtonClick="ContentDialog_PrimaryButtonClick"
+    MaxHeight="800">
+
+    <StackPanel>
+        <Canvas 
+            Width="450" Height="40">
+            <TextBlock 
+                x:Name="UserDisplayNameLabel"
+                Text="Display Name"
+                FontSize="16" 
+                Canvas.Top="10"/>
+            <TextBlock 
+                x:Name="UserDisplayName"
+                Text="{Binding Path=DeviceAddress}"
+                ToolTipService.ToolTip="The address of the target device"
+                FontSize="16"
+                Width="347"
+                Canvas.Left="103" Canvas.Top="10"/>
+        </Canvas>
+        <Canvas
+            Width="450" Height="440">
+            <TextBlock 
+                x:Name="UserEmailLabel"
+                Text="Email"
+                FontSize="16"/>
+            <ListBox 
+                x:Name="MobileCenterAppsList"
+                ItemsSource="{Binding MobileCenterApps}"
+                SelectedItem="{Binding SelectedMobileCenterApp, Mode=TwoWay}"
+                ToolTipService.ToolTip="Mobile Center apps from your organization"
+                Width="395" Height= "400"  
+                BorderThickness="1" 
+                ScrollViewer.HorizontalScrollMode="Auto"
+                ScrollViewer.HorizontalScrollBarVisibility="Auto"
+                Canvas.Top="26"/>
+            <Button 
+                x:Name="downloadSelectedApp"
+                Content="&#xE896;"
+                Command="{Binding DownloadInstallMobileAppsCommand}"
+                ToolTipService.ToolTip="Download and install selected app from the Mobile Center"
+                FontFamily="Segoe MDL2 Assets" FontSize="24" 
+                Width="50" Height="40" 
+                Canvas.Left="400" Canvas.Top="25"/>
+        </Canvas>
+    </StackPanel>
+</ContentDialog>

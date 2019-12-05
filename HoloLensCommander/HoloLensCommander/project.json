@@ -1,7 +1,8 @@
 ﻿{
   "dependencies": {
     "Microsoft.NETCore.UniversalWindowsPlatform": "5.1.0",
-	  "WindowsDevicePortalWrapper": "0.9.5.1"
+	"WindowsDevicePortalWrapper": "0.9.4"
+    "Newtonsoft.Json": "10.0.3",
   },
   "frameworks": {
     "uap10.0": {}

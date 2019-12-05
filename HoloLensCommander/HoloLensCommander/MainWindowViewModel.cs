@@ -20,6 +20,9 @@ namespace HoloLensCommander
         /// Values used to store and retrieve settings data.
         /// </summary>
         private static readonly string AutoReconnectKey = "autoReconnect";
+        private static readonly string DefaultAPItokenKey = "defaultAPItokenKey";
+        private static readonly string DefaultAppCenterUserNameKey = "defaultAppCenterUserName";
+        private static readonly string DefaultAppCenterPasswordKey = "defaultAppCenterPassword";
         private static readonly string DefaultNetworkKeyKey = "defaultNetworkKey";
         private static readonly string DefaultPasswordKey = "defaultPassword";
         private static readonly string DefaultSsidKey = "defaultSsid";
@@ -373,6 +376,18 @@ namespace HoloLensCommander
                 (parameter) =>
                 {
                     this.SelectAllDevices();
+                });
+
+            this.ShowMobileCenterAppsCommand = new Command(
+                async (parameter) =>
+                {
+                    await this.ShowMobileCenterApps();
+                });
+
+            this.ShowSetAPItokenCommand = new Command(
+                async (parameter) =>
+                {
+                    await this.ShowSetAPItoken();
                 });
 
             this.ShowSetCredentialsCommand = new Command(
